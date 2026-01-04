@@ -12,11 +12,15 @@ export const useLogout = () => {
   >({
     mutationFn: async () => {
       const res = await client.api.auth.logout.$post();
+      if (!res.ok) {
+        throw new Error("Failed to logout");
+      }
       return await res.json();
     },
     onSuccess: () => {
       router.refresh();
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
     }
   });
 

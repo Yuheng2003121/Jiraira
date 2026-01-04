@@ -2,7 +2,7 @@
 "use server";
 import { Client, Account } from "node-appwrite";
 import { cookies } from "next/headers";
-import { AUTH_COOKIE } from "@/app/modules/auth/constants";
+import { AUTH_COOKIE } from "@/modules/auth/constants";
 
 export async function createSessionClient() {
   const client = new Client()
@@ -11,9 +11,8 @@ export async function createSessionClient() {
 
   const session = await (await cookies()).get(AUTH_COOKIE);
   if (!session || !session.value) {
-    throw new Error("No session"); 
+    throw new Error("No session");
   }
-  
 
   client.setSession(session.value);
 

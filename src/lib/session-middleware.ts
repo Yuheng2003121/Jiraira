@@ -1,9 +1,14 @@
-import { AUTH_COOKIE } from "@/app/modules/auth/constants";
+import { AUTH_COOKIE } from "@/modules/auth/constants";
 import { createMiddleware } from "hono/factory";
 import { cookies } from "next/headers";
-import { Account, Client, Databases, Models, Users, Storage } from "node-appwrite";
-
-
+import {
+  Account,
+  Client,
+  Databases,
+  Models,
+  Users,
+  Storage,
+} from "node-appwrite";
 
 type Context = {
   Variables: {
@@ -11,7 +16,7 @@ type Context = {
     databases: Databases;
     storage: Storage;
     users: Users;
-    user: Models.User<Models.Preferences>
+    user: Models.User<Models.Preferences>;
   };
 };
 

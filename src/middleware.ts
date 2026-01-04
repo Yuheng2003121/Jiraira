@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { AUTH_COOKIE } from "./app/modules/auth/constants";
+import { AUTH_COOKIE } from "./modules/auth/constants";
 
 export function middleware(request: NextRequest) {
   const session = request.cookies.get(AUTH_COOKIE);
   const { pathname, search } = request.nextUrl;
-  
 
   // 如果没有 Session 且不是去往登录页
   if (!session && !pathname.startsWith("/sign-in")) {

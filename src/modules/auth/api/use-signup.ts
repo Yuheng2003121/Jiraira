@@ -11,6 +11,9 @@ export const useSignup = () => {
   >({
     mutationFn: async (json) => {
       const res = await client.api.auth.register.$post({ json });
+      if (!res.ok) {
+        throw new Error("Failed to login");
+      }
       return await res.json();
     },
   });
