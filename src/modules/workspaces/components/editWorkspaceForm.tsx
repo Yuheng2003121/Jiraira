@@ -26,23 +26,17 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUpdateWorkspace } from "../api/use-update-workspace";
 import { Workspace } from "../types";
-import { useGetWorkspaceById } from "../api/use-get-workspace-id";
 
 interface EditWorkspaceFormProps {
   onCancel?: () => void;
   initialValues: Workspace
-  workspaceId: string;
 }
 export default function EditWorkspaceForm({
   onCancel,
   initialValues,
-  workspaceId,
 }: EditWorkspaceFormProps) {
   const { mutate: updateWorkspace, isPending } = useUpdateWorkspace();
 
-  // const { data, isPending:isPendingGet} = useGetWorkspaceById(workspaceId);
-
-  // const initialValues = data as Workspace;
 
   const inputRef = useRef<HTMLInputElement>(null);
   console.log(initialValues);
@@ -77,9 +71,12 @@ export default function EditWorkspaceForm({
     updateWorkspace(
       { form: values, param: { workspaceId: initialValues.$id } },
       {
-        onSuccess: (data) => {
-          toast.success("Workspace created successfully");
+        onSuccess: (data) => { 
+          toast.success("Workspace updated successfully");
           queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+          queryClient.invalidateQueries({
+            queryKey: ["workspaces", initialValues.$id],
+          });
           form.reset();
 
           onCancel?.(); //关闭create workspace modal
@@ -92,14 +89,6 @@ export default function EditWorkspaceForm({
     );
   };
 
-  // if (isPendingGet && !initialValues) {
-  //   return <div>Loading...</div>; // 或者返回一个 Skeleton 骨架屏
-  // }
-
-  // // 2. 处理找不到数据的情况
-  // if (!initialValues) {
-  //   return <div>Workspace not found</div>;
-  // }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -194,13 +183,13 @@ export default function EditWorkspaceForm({
                 className={cn(
                   "cursor-pointer",
                   //if onCancel is not provided, that means it is not a modal but in a page
-                  !onCancel && "invisible"
+                  // !onCancel && "invisible"
                 )}
                 type="button"
                 variant={"secondary"}
                 size={"lg"}
                 disabled={isPending}
-                onClick={() => onCancel?.()}
+                onClick={() => onCancel ? onCancel() : router.push(`/workspaces/${initialValues.$id}`)}
               >
                 Cancel
               </Button>

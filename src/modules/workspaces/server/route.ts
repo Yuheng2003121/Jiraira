@@ -172,7 +172,7 @@ const workspaces = new Hono()
 
       const updatedWorkspace = await databases.updateDocument({
         databaseId: DATABASE_ID,
-        collectionId: "worksapces",
+        collectionId: "workspaces",
         documentId: workspaceId,
         data: {
           name,
