@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import z from "zod";
-import { createWorkspaceSchema } from "../schema";
+import { updateWorkspaceSchema } from "../schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateWorkspace } from "../api/use-create-workspace";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
@@ -25,47 +24,82 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useUpdateWorkspace } from "../api/use-update-workspace";
+import { Workspace } from "../types";
+import { useGetWorkspaceById } from "../api/use-get-workspace-id";
 
-interface CreateWorkspaceFormProps {
+interface EditWorkspaceFormProps {
   onCancel?: () => void;
+  initialValues: Workspace
+  workspaceId: string;
 }
-export default function CreateWorkspaceForm({
+export default function EditWorkspaceForm({
   onCancel,
-}: CreateWorkspaceFormProps) {
-  const { mutate: createWorkspace, isPending } = useCreateWorkspace();
+  initialValues,
+  workspaceId,
+}: EditWorkspaceFormProps) {
+  const { mutate: updateWorkspace, isPending } = useUpdateWorkspace();
 
-  const form = useForm<z.infer<typeof createWorkspaceSchema>>({
-    resolver: zodResolver(createWorkspaceSchema),
+  // const { data, isPending:isPendingGet} = useGetWorkspaceById(workspaceId);
+
+  // const initialValues = data as Workspace;
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  console.log(initialValues);
+  
+
+  const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
+    resolver: zodResolver(updateWorkspaceSchema),
     defaultValues: {
-      name: "",
+      ...initialValues,
+      image: (initialValues as Workspace)?.imageUrl ?? "",
     },
   });
 
+  useEffect(() => {
+    if (initialValues) {
+      form.reset({
+        ...initialValues,
+        image: initialValues.imageUrl ?? "", 
+      });
+    }
+  }, [initialValues, form]);
 
   const queryClient = useQueryClient();
   const router = useRouter();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const onSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
+  const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
     // console.log(values);
     values = {
       ...values,
-      image: values.image instanceof File ? values.image : ""
-    }
+      image: values.image instanceof File ? values.image : "",
+    };
 
-    createWorkspace(values, {
-      onSuccess: (data) => {
-        toast.success("Workspace created successfully");
-        queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-        form.reset();
+    updateWorkspace(
+      { form: values, param: { workspaceId: initialValues.$id } },
+      {
+        onSuccess: (data) => {
+          toast.success("Workspace created successfully");
+          queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+          form.reset();
 
-        onCancel?.();//关闭create workspace modal
-        router.push(`/workspaces/${data.$id}`);
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    });
+          onCancel?.(); //关闭create workspace modal
+          router.push(`/workspaces/${data.$id}`);
+        },
+        onError: (error) => {
+          toast.error(error.message);
+        },
+      }
+    );
   };
+
+  // if (isPendingGet && !initialValues) {
+  //   return <div>Loading...</div>; // 或者返回一个 Skeleton 骨架屏
+  // }
+
+  // // 2. 处理找不到数据的情况
+  // if (!initialValues) {
+  //   return <div>Workspace not found</div>;
+  // }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -74,10 +108,10 @@ export default function CreateWorkspaceForm({
     }
   };
   return (
-    <Card className="border-0 shadow-none w-full py-10 ">
+    <Card className="border shadow-none w-full py-10 ">
       <CardHeader>
         <CardTitle className="text-xl font-bold">
-          Create a new workspace
+          {initialValues.name}
         </CardTitle>
       </CardHeader>
       <DottedSeparator className="mb-1" />
@@ -105,10 +139,13 @@ export default function CreateWorkspaceForm({
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-5" onClick={(e) => {
-                    e.preventDefault();
-                    inputRef.current?.click();
-                  }}>
+                  <FormLabel
+                    className="flex items-center gap-5"
+                    onClick={(e) => {
+                       e.preventDefault();
+                       inputRef.current?.click();
+                    }}
+                  >
                     <div className="flex items-center gap-4">
                       <div className="flex items-center cursor-pointer size-18 relative overflow-hidden">
                         {field.value ? (
@@ -173,7 +210,7 @@ export default function CreateWorkspaceForm({
                 size={"lg"}
                 disabled={isPending}
               >
-                Create
+                Update
               </Button>
             </div>
           </form>

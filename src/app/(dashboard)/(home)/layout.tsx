@@ -14,8 +14,7 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="h-screen">
-
-      <CreateWorkspaceModal/>
+      <CreateWorkspaceModal />
       <ResizablePanelGroup
         direction="horizontal"
         className="h-full rounded-lg "
@@ -23,12 +22,9 @@ export default function DashboardLayout({
         <ResizablePanel defaultSize={20} className="hidden lg:block">
           <Sidebar />
         </ResizablePanel>
-        <ResizableHandle  className="hidden lg:block"/>
-        <ResizablePanel defaultSize={80} className="flex flex-col">
-          <Navbar />
-          <div className="p-6 flex-1">
-            {children}
-          </div>
+        <ResizableHandle className="hidden lg:block" />
+        <ResizablePanel defaultSize={80}>
+          {children}
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
