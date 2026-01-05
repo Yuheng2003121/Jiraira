@@ -34,36 +34,33 @@ const workspaces = new Hono()
 
     return c.json(workspaces);
   })
-  .get("/:workspaceId", sessionMiddleware,
-    async (c) => {
-      const databases = c.get("databases");
-      const user = c.get("user");
+  .get("/:workspaceId", sessionMiddleware, async (c) => {
+    const databases = c.get("databases");
+    const user = c.get("user");
 
-      const { workspaceId } = c.req.param();
+    const { workspaceId } = c.req.param();
 
-      const member = await getMember({
-        databases,
-        workspaceId,
-        userId: user.$id,
-      });
+    const member = await getMember({
+      databases,
+      workspaceId,
+      userId: user.$id,
+    });
 
-      if (!member) {
-        return c.json(
-          { error: "You are not authorized to view this workspace" },
-          401
-        )
-      }
-
-      const workspace = await databases.getDocument({
-        databaseId: DATABASE_ID,
-        collectionId: "workspaces",
-        documentId: workspaceId,
-      });
-
-      return c.json(workspace);
-
+    if (!member) {
+      return c.json(
+        { error: "You are not authorized to view this workspace" },
+        401
+      );
     }
-  )
+
+    const workspace = await databases.getDocument({
+      databaseId: DATABASE_ID,
+      collectionId: "workspaces",
+      documentId: workspaceId,
+    });
+
+    return c.json(workspace);
+  })
 
   .post(
     "/",
@@ -182,6 +179,33 @@ const workspaces = new Hono()
 
       return c.json(updatedWorkspace);
     }
-  );
+  )
+  .delete("/:workspaceId", sessionMiddleware, async (c) => {
+    const databases = c.get("databases");
+    const user = c.get("user");
+
+    const { workspaceId } = c.req.param();
+
+    const member = await getMember({
+      databases,
+      workspaceId,
+      userId: user.$id,
+    });
+
+    if (!member || member.role !== MemberRole.ADMIN) {
+      return c.json(
+        { error: "You are not authorized to delete this workspace" },
+        401
+      );
+    }
+
+    await databases.deleteDocument({
+      databaseId: DATABASE_ID,
+      collectionId: "workspaces",
+      documentId: workspaceId,
+    });
+
+    return c.json({ $id: workspaceId });
+  });
 
 export default workspaces;

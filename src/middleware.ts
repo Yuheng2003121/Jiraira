@@ -4,6 +4,7 @@ import { AUTH_COOKIE } from "./modules/auth/constants";
 
 export function middleware(request: NextRequest) {
   const session = request.cookies.get(AUTH_COOKIE);
+
   const { pathname, search } = request.nextUrl;
 
   // 如果没有 Session 且不是去往登录页

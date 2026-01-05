@@ -74,7 +74,7 @@ export default function CreateWorkspaceForm({
     }
   };
   return (
-    <Card className="border-0 shadow-none w-full py-10 ">
+    <Card className="border-0 shadow-none w-full py-4 ">
       <CardHeader>
         <CardTitle className="text-xl font-bold">
           Create a new workspace

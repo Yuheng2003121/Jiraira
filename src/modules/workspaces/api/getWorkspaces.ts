@@ -1,23 +1,11 @@
 import { DATABASE_ID, WORKSPACES_ID } from "@/constants";
-import { AUTH_COOKIE } from "@/modules/auth/constants";
-import { cookies } from "next/headers";
-import { Account, Client, Databases, Query } from "node-appwrite";
+import { createSessionClient } from "@/lib/appwrite";
+import {  Query } from "node-appwrite";
 
 export const getWorkspaces = async () => {
   try {
-    const client = new Client()
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-      .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
+   const {databases, account } = await createSessionClient();
 
-    const session = (await cookies()).get(AUTH_COOKIE);
-    if (!session || !session.value) {
-      return { documents: [], total: 0 };
-    }
-
-    client.setSession(session.value);
-
-    const databases = new Databases(client);
-    const account = new Account(client);
     const user = await account.get();
 
     const members = await databases.listDocuments({

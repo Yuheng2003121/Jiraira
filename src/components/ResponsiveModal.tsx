@@ -15,6 +15,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface ResponsiveModalProps {
   children: React.ReactNode;
@@ -31,8 +32,9 @@ export default function ResponsiveModal({
   if (isDesktop) {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogTitle className="hidden">create</DialogTitle>
-        <DialogContent className="sm:max-w-lg overflow-y-auto hide-scrollbar max-h-[85vh] p-4">
+        <DialogTitle className="hidden"></DialogTitle>
+        <DialogContent className="sm:max-w-lg overflow-y-auto hide-scrollbar max-h-[85vh] p-4 ">
+          <DialogDescription className="hidden"></DialogDescription>
           {children}
         </DialogContent>
       </Dialog>
@@ -42,8 +44,9 @@ export default function ResponsiveModal({
   //mobile
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
-      <DrawerTitle className="hidden">create</DrawerTitle>
+      <DrawerTitle className="hidden"></DrawerTitle>
       <DrawerContent>
+        <DialogDescription className="hidden"></DialogDescription>
         <div className="overflow-y-auto hide-scrollbar max-h-[85vh]">
           {children}
         </div>
