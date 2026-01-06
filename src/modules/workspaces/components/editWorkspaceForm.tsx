@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import z from "zod";
 import { updateWorkspaceSchema } from "../schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,13 +21,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ImageIcon } from "lucide-react";
+import { CheckIcon, CopyCheckIcon, CopyIcon, ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUpdateWorkspace } from "../api/use-update-workspace";
 import { Workspace } from "../types";
 import { useDeleteWorkspace } from "../api/use-delete-workspace";
 import useConfirm from "@/hooks/use-confirm";
+import { CustomTooltip } from "@/components/CustomTooltip";
+import { useResetInvitecode } from "../api/use-reset-invitecode";
 
 interface EditWorkspaceFormProps {
   onCancel?: () => void;
@@ -42,6 +44,9 @@ export default function EditWorkspaceForm({
   const { mutate: deleteWorksapce, isPending: isDeletePending } =
     useDeleteWorkspace();
 
+  const { mutate: resetInvitecode, isPending: isResetInvitecodePending } =
+    useResetInvitecode();
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
@@ -52,14 +57,7 @@ export default function EditWorkspaceForm({
     },
   });
 
-  useEffect(() => {
-    if (initialValues) {
-      form.reset({
-        ...initialValues,
-        image: initialValues.imageUrl ?? "",
-      });
-    }
-  }, [initialValues, form]);
+  
 
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -128,8 +126,34 @@ export default function EditWorkspaceForm({
     );
   };
 
+  const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
+
+  const [isCopied, setIsCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(fullInviteLink);
+    toast.success("Copied to clipboard");
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 6000);
+  };
+
+  const handleResetInviteCode = () => { 
+    resetInvitecode({param: {workspaceId: initialValues.$id}}, {
+      onSuccess: (data) => { 
+        toast.success("Invite code reset successfully");
+        queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+        queryClient.invalidateQueries({
+          queryKey: ["workspace", data.$id],
+        });
+
+      },
+      onError: (error) => { 
+        toast.error(error.message);
+      }
+    })
+  };
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-8">
       <DeleteDialog />
       <Card className="border  w-full py-4 ">
         <CardHeader>
@@ -245,6 +269,43 @@ export default function EditWorkspaceForm({
         </CardContent>
       </Card>
 
+      <Card className="border w-full py-4">
+        <CardContent>
+          <div className="flex flex-col">
+            <h3 className="font-bold">Invite members</h3>
+            <p className="text-sm text-muted-foreground">
+              Use the invite link to add members to your workspace.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Input disabled value={fullInviteLink} />
+
+              <CustomTooltip
+                message={isCopied ? "Copied" : "Copy to clipboard"}
+                onClick={handleCopy}
+                className="size-12"
+                variant={"secondary"}
+              >
+                {isCopied ? (
+                  <CopyCheckIcon className="size-4" />
+                ) : (
+                  <CopyIcon className="size-4" />
+                )}
+              </CustomTooltip>
+            </div>
+            <Button
+              className="w-fit ml-auto mt-4"
+              size="sm"
+              variant={"destructive"}
+              type="button"
+              disabled={isUpdatePending || isDeletePending}
+              onClick={() => handleResetInviteCode()}
+            >
+              Reset invite link
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="border  w-full py-4">
         <CardContent>
           <div className="flex flex-col">
@@ -260,7 +321,7 @@ export default function EditWorkspaceForm({
               disabled={isUpdatePending || isDeletePending}
               onClick={() => handleDelete()}
             >
-              Delete Worksapce 
+              Delete Worksapce
             </Button>
           </div>
         </CardContent>

@@ -13,17 +13,17 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="h-screen">
+    <div className="min-h-screen">
       <CreateWorkspaceModal />
       <ResizablePanelGroup
         direction="horizontal"
-        className="h-full rounded-lg "
+        className="min-h-screen rounded-lg "
       >
         <ResizablePanel defaultSize={20} className="hidden lg:block">
           <Sidebar />
         </ResizablePanel>
         <ResizableHandle className="hidden lg:block" />
-        <ResizablePanel defaultSize={80}>
+        <ResizablePanel defaultSize={80} >
           {children}
         </ResizablePanel>
       </ResizablePanelGroup>

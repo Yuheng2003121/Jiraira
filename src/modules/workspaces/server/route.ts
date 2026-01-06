@@ -7,7 +7,8 @@ import { DATABASE_ID, IMAGES_BUCKET_ID, WORKSPACES_ID } from "@/constants";
 import { MemberRole } from "@/modules/members/types";
 import { generateInviteCode } from "@/lib/utils";
 import { getMember } from "@/modules/members/utils";
-import { error } from "console";
+import z from "zod";
+import { Workspace } from '../types';
 
 const workspaces = new Hono()
   .get("/", sessionMiddleware, async (c) => {
@@ -206,6 +207,82 @@ const workspaces = new Hono()
     });
 
     return c.json({ $id: workspaceId });
-  });
+  })
+  .post("/:workspaceId/reset-invite-code", sessionMiddleware, async (c) => {
+    const databases = c.get("databases");
+    const user = c.get("user");
+
+    const { workspaceId } = c.req.param();
+
+    const member = await getMember({
+      databases,
+      workspaceId,
+      userId: user.$id,
+    });
+
+    if (!member || member.role !== MemberRole.ADMIN) {
+      return c.json(
+        { error: "You are not authorized to delete this workspace" },
+        401
+      );
+    }
+
+    const worksapce = await databases.updateDocument({
+      databaseId: DATABASE_ID,
+      collectionId: "workspaces",
+      documentId: workspaceId,
+      data: {
+        inviteCode: generateInviteCode(6),
+      },
+    });
+
+    return c.json(worksapce);
+  })
+  .post(
+    '/:workspaceId/join',
+    sessionMiddleware,
+    zValidator("json",z.object({inviteCode: z.string()})),
+    async (c) => {
+      const {workspaceId} = c.req.param();
+      const {inviteCode} = c.req.valid('json');
+
+      const databases = c.get('databases');
+      const user = c.get('user');
+
+      const member = await getMember({
+        workspaceId,
+        userId: user.$id,
+        databases
+      })
+
+      if (member) {
+        return c.json({error: 'You are already a member of this workspace'}, 400)
+      }
+
+      const workspace = await databases.getDocument<Workspace>({
+        databaseId: DATABASE_ID,
+        collectionId: 'workspaces',
+        documentId: workspaceId
+      })
+
+      if (workspace.inviteCode !== inviteCode) {
+        return c.json({error: 'Invalid invite code'}, 400)
+      }
+
+      await databases.createDocument({
+        databaseId: DATABASE_ID,
+        collectionId: 'members',
+        documentId: ID.unique(),
+        data: {
+          userId: user.$id,
+          workspaceId,
+          role: MemberRole.MEMBER
+        }
+      })
+
+      return c.json(workspace);
+
+    }
+  )
 
 export default workspaces;

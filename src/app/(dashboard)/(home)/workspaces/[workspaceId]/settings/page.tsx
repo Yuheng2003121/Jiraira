@@ -1,9 +1,8 @@
 "use client";
-import NavbarLogo from "@/components/NavbarLogo";
+import Loader from "@/components/Loader";
 import { useGetWorkspaceById } from "@/modules/workspaces/api/use-get-workspace-id";
 import EditWorkspaceForm from "@/modules/workspaces/components/editWorkspaceForm";
 import { Workspace } from "@/modules/workspaces/types";
-import { LoaderCircleIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import React from "react";
 
@@ -21,9 +20,7 @@ WowrkspaceSettingsPageProps) {
 
   if (isPending && !initialValues) {
     return (
-      <div className="w-full h-full flex justify-center items-center">
-        <LoaderCircleIcon className="text-neutral-500 animate-spin" />
-      </div>
+      <Loader/>
     ); // 或者返回一个 Skeleton 骨架屏
   }
 
@@ -33,13 +30,16 @@ WowrkspaceSettingsPageProps) {
   }
 
   return (
-    <div className="flex flex-col gap-18 min-h-screen ">
-      <NavbarLogo />
-      <div className="flex-1 w-full flex">
-        <div className="w-full max-w-2xl mx-auto">
-          {initialValues && <EditWorkspaceForm initialValues={initialValues} />}
-        </div>
-      </div>
+    // <div className="flex flex-col  min-h-screen ">
+    //   <NavbarLogo />
+    //   <div className="flex-1 w-full flex py-10">
+    //     <div className="w-full max-w-2xl mx-auto">
+    //       {initialValues && <EditWorkspaceForm initialValues={initialValues} />}
+    //     </div>
+    //   </div>
+    // </div>
+    <div className="max-w-2xl mx-auto">
+      {initialValues && <EditWorkspaceForm initialValues={initialValues} />}
     </div>
   );
 }
