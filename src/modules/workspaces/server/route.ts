@@ -3,12 +3,12 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { createWorkspaceSchema, updateWorkspaceSchema } from "../schema";
 import { sessionMiddleware } from "@/lib/session-middleware";
-import { DATABASE_ID, IMAGES_BUCKET_ID, WORKSPACES_ID } from "@/constants";
+import { DATABASE_ID, IMAGES_BUCKET_ID } from "@/constants";
 import { MemberRole } from "@/modules/members/types";
 import { generateInviteCode } from "@/lib/utils";
 import { getMember } from "@/modules/members/utils";
 import z from "zod";
-import { Workspace } from '../types';
+import { Workspace } from "../types";
 
 const workspaces = new Hono()
   .get("/", sessionMiddleware, async (c) => {
@@ -27,11 +27,14 @@ const workspaces = new Hono()
 
     const workspaceIds = members.documents.map((member) => member.workspaceId);
 
-    const workspaces = await databases.listDocuments(
-      DATABASE_ID,
-      WORKSPACES_ID,
-      [Query.orderDesc("$createdAt"), Query.contains("$id", workspaceIds)]
-    );
+    const workspaces = await databases.listDocuments({
+      databaseId: DATABASE_ID,
+      collectionId: "workspaces",
+      queries: [
+        Query.orderDesc("$createdAt"),
+        Query.contains("$id", workspaceIds),
+      ],
+    });
 
     return c.json(workspaces);
   })
@@ -97,7 +100,7 @@ const workspaces = new Hono()
 
       const workspace = await databases.createDocument({
         databaseId: DATABASE_ID,
-        collectionId: WORKSPACES_ID,
+        collectionId: "workspaces",
         documentId: ID.unique(),
         data: {
           name,
@@ -239,50 +242,52 @@ const workspaces = new Hono()
     return c.json(worksapce);
   })
   .post(
-    '/:workspaceId/join',
+    "/:workspaceId/join",
     sessionMiddleware,
-    zValidator("json",z.object({inviteCode: z.string()})),
+    zValidator("json", z.object({ inviteCode: z.string() })),
     async (c) => {
-      const {workspaceId} = c.req.param();
-      const {inviteCode} = c.req.valid('json');
+      const { workspaceId } = c.req.param();
+      const { inviteCode } = c.req.valid("json");
 
-      const databases = c.get('databases');
-      const user = c.get('user');
+      const databases = c.get("databases");
+      const user = c.get("user");
 
       const member = await getMember({
         workspaceId,
         userId: user.$id,
-        databases
-      })
+        databases,
+      });
 
       if (member) {
-        return c.json({error: 'You are already a member of this workspace'}, 400)
+        return c.json(
+          { error: "You are already a member of this workspace" },
+          400
+        );
       }
 
       const workspace = await databases.getDocument<Workspace>({
         databaseId: DATABASE_ID,
-        collectionId: 'workspaces',
-        documentId: workspaceId
-      })
+        collectionId: "workspaces",
+        documentId: workspaceId,
+      });
 
       if (workspace.inviteCode !== inviteCode) {
-        return c.json({error: 'Invalid invite code'}, 400)
+        return c.json({ error: "Invalid invite code" }, 400);
       }
 
       await databases.createDocument({
         databaseId: DATABASE_ID,
-        collectionId: 'members',
+        collectionId: "members",
         documentId: ID.unique(),
         data: {
           userId: user.$id,
           workspaceId,
-          role: MemberRole.MEMBER
-        }
-      })
+          role: MemberRole.MEMBER,
+        },
+      });
 
       return c.json(workspace);
-
     }
-  )
+  );
 
 export default workspaces;

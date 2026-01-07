@@ -1,7 +1,7 @@
 "use client";
 import Loader from "@/components/Loader";
 import { useGetWorkspaceById } from "@/modules/workspaces/api/use-get-workspace-id";
-import EditWorkspaceForm from "@/modules/workspaces/components/editWorkspaceForm";
+import EditWorkspaceForm from "@/modules/workspaces/components/EditWorkspaceForm";
 import { Workspace } from "@/modules/workspaces/types";
 import { useParams } from "next/navigation";
 import React from "react";

@@ -9,7 +9,7 @@ export default function WorkspaceIdlayout({
   return (
     <div className="flex flex-col h-screen overflow-auto">
       <NavbarLogo />
-      <div className="flex-1 w-full flex py-10 px-6">
+      <div className="flex-1 w-full py-10 px-6">
         {children}
       </div>
     </div>

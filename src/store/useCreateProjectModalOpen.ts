@@ -5,7 +5,7 @@ type CounterStore = {
   setIsOpen: (open: boolean) => void;
 };
 
-export const useCreateModalOpen = create<CounterStore>((set) => ({
+export const useCreateProjectModalOpen = create<CounterStore>((set) => ({
   isOpen: false,
   setIsOpen: (isOpen) => set(() => ({ isOpen })),
 }));

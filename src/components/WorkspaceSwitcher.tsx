@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import WorkspaceAvatar from "@/modules/workspaces/components/WorkspaceAvatar";
 import { useParams, useRouter } from "next/navigation";
-import { useCreateModalOpen } from "@/store/useCreateModalOpen";
+import { useCreateWorkspaceModalOpen } from "@/store/useCreateWorkspaceModalOpen";
 
 export default function WorkspaceSwitcher() {
   const { data: workspaces } = useGetWorkspaces();
@@ -20,12 +20,10 @@ export default function WorkspaceSwitcher() {
   const router = useRouter();
 
   const { workspaceId } = useParams();
- const setIsOpen = useCreateModalOpen((state) => state.setIsOpen);
+  const setIsOpen = useCreateWorkspaceModalOpen((state) => state.setIsOpen);
   const handleValueChange = (workspaceId: string) => {
     router.push(`/workspaces/${workspaceId}`);
   };
-
-  
 
   return (
     <div className="flex flex-col gap-2">

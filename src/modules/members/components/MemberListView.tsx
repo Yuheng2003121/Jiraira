@@ -114,7 +114,7 @@ export default function MemberListView() {
                   <DropdownMenuContent side="bottom" align="center">
                     <DropdownMenuGroup>
                       <DropdownMenuItem
-                        className="font-medium"
+                        className="font-medium cursor-pointer"
                         onClick={() =>
                           handleUpdateMember(member.$id, MemberRole.ADMIN)
                         }
@@ -125,7 +125,7 @@ export default function MemberListView() {
                         Set as Admin
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="font-medium"
+                        className="font-medium cursor-pointer"
                         onClick={() =>
                           handleUpdateMember(member.$id, MemberRole.MEMBER)
                         }
@@ -136,7 +136,7 @@ export default function MemberListView() {
                         Set as Member
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="font-medium text-amber-700"
+                        className="font-medium text-amber-700 cursor-pointer"
                         onClick={() => handleRemoveMember(member.$id)}
                         disabled={
                           isRemoveMemberPending || isUpdateMemberPending

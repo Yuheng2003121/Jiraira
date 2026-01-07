@@ -5,6 +5,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import CreateProjectModal from "@/modules/projects/components/CreateProjectModal";
 import CreateWorkspaceModal from "@/modules/workspaces/components/CreateWorkspaceModal";
 
 export default function DashboardLayout({
@@ -15,6 +16,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen">
       <CreateWorkspaceModal />
+      <CreateProjectModal />
       <ResizablePanelGroup
         direction="horizontal"
         className="min-h-screen rounded-lg "
@@ -23,9 +25,7 @@ export default function DashboardLayout({
           <Sidebar />
         </ResizablePanel>
         <ResizableHandle className="hidden lg:block" />
-        <ResizablePanel defaultSize={80} >
-          {children}
-        </ResizablePanel>
+        <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
       </ResizablePanelGroup>
     </div>
   );

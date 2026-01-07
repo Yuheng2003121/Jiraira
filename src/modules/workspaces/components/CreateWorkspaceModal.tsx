@@ -1,7 +1,7 @@
 "use client";
 // import ResponsiveModal from "@/components/ResponsiveModal";
 import CreateWorkspaceForm from "./CreateWorkspaceForm";
-import { useCreateModalOpen } from "@/store/useCreateModalOpen";
+import { useCreateWorkspaceModalOpen } from "@/store/useCreateWorkspaceModalOpen";
 import dynamic from "next/dynamic";
 
 const ResponsiveModal = dynamic(() => import("@/components/ResponsiveModal"), {
@@ -9,8 +9,8 @@ const ResponsiveModal = dynamic(() => import("@/components/ResponsiveModal"), {
 });
 
 export default function CreateWorkspaceModal() {
- const isOpen = useCreateModalOpen((state) => state.isOpen);
- const setIsOpen = useCreateModalOpen((state) => state.setIsOpen);
+  const isOpen = useCreateWorkspaceModalOpen((state) => state.isOpen);
+  const setIsOpen = useCreateWorkspaceModalOpen((state) => state.setIsOpen);
 
   return (
     <ResponsiveModal isOpen={isOpen} onOpenChange={setIsOpen}>

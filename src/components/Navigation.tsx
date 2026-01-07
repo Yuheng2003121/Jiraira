@@ -39,7 +39,7 @@ export default function Navigation() {
   const workspaceId = params.workspaceId as string;
 
   return (
-    <ul className='flex flex-col gap-2'>
+    <ul className='flex flex-col'>
       {routes.map((route) => {
         const fullPath = `/workspaces/${workspaceId}${route.href}`;
         const isActive = pathname === fullPath;

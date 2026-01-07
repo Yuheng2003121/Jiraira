@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import z from "zod";
-import { updateWorkspaceSchema } from "../schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -21,72 +20,68 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { CheckIcon, CopyCheckIcon, CopyIcon, ImageIcon } from "lucide-react";
+import { ArrowLeft, ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useUpdateWorkspace } from "../api/use-update-workspace";
-import { Workspace } from "../types";
-import { useDeleteWorkspace } from "../api/use-delete-workspace";
 import useConfirm from "@/hooks/use-confirm";
-import { CustomTooltip } from "@/components/CustomTooltip";
-import { useResetInvitecode } from "../api/use-reset-invitecode";
+import { useUpdateProject } from "../api/use-update-project";
+import { useDeleteProject } from "../api/use-delete-project";
+import { updateProjectSchema } from "../schema";
+import { Project } from "../types";
+import Link from "next/link";
 
-interface EditWorkspaceFormProps {
+interface EditProjectFormProps {
   onCancel?: () => void;
-  initialValues: Workspace;
+  initialValues: Project;
 }
-export default function EditWorkspaceForm({
+export default function EditProjectForm({
   onCancel,
   initialValues,
-}: EditWorkspaceFormProps) {
-  const { mutate: updateWorkspace, isPending: isUpdatePending } =
-    useUpdateWorkspace();
+}: EditProjectFormProps) {
+  const { mutate: updateProject, isPending: isUpdatePending } =
+    useUpdateProject();
   const { mutate: deleteWorksapce, isPending: isDeletePending } =
-    useDeleteWorkspace();
-
-  const { mutate: resetInvitecode, isPending: isResetInvitecodePending } =
-    useResetInvitecode();
+    useDeleteProject();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
-    resolver: zodResolver(updateWorkspaceSchema),
+  const form = useForm<z.infer<typeof updateProjectSchema>>({
+    resolver: zodResolver(updateProjectSchema),
     defaultValues: {
       ...initialValues,
-      image: (initialValues as Workspace)?.imageUrl ?? "",
+      image: (initialValues as Project)?.imageUrl ?? "",
     },
   });
 
-   useEffect(() => { 
-      form.reset({
-        ...initialValues,
-        image: (initialValues as Workspace)?.imageUrl ?? "",
-      });
-    }, [initialValues, form]);
-
-  
+  useEffect(() => {
+    form.reset({
+      ...initialValues,
+      image: (initialValues as Project)?.imageUrl ?? "",
+    });
+  }, [initialValues, form]);
 
   const queryClient = useQueryClient();
   const router = useRouter();
-  const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
+  const onSubmit = (values: z.infer<typeof updateProjectSchema>) => {
     // console.log(values);
     values = {
       ...values,
       image: values.image instanceof File ? values.image : "",
     };
 
-    updateWorkspace(
-      { form: values, param: { workspaceId: initialValues.$id } },
+    updateProject(
+      { form: values, param: { projectId: initialValues.$id } },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           toast.success("Workspace updated successfully");
-          queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+          queryClient.invalidateQueries({ queryKey: ["projects"] });
           queryClient.invalidateQueries({
-            queryKey: ["workspaces", initialValues.$id],
+            queryKey: ["project", initialValues.$id],
           });
           form.reset();
+          router.refresh();
 
-          onCancel?.(); //关闭create workspace modal
+          onCancel?.(); //关闭create project modal
           // router.push(`/workspaces/${data.$id}`);
         },
         onError: (error) => {
@@ -104,7 +99,7 @@ export default function EditWorkspaceForm({
   };
 
   const [DeleteDialog, confirmDelete] = useConfirm(
-    "Delete Worksapce",
+    "Delete Project",
     "This action cannot be undone",
     "destructive"
   );
@@ -115,13 +110,13 @@ export default function EditWorkspaceForm({
     if (!confirm) return;
 
     deleteWorksapce(
-      { param: { workspaceId: initialValues.$id } },
+      { param: { projectId: initialValues.$id } },
       {
         onSuccess: (data) => {
-          toast.success("Workspace deleted successfully");
-          queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+          toast.success("Project deleted successfully");
+          queryClient.invalidateQueries({ queryKey: ["projects"] });
           queryClient.invalidateQueries({
-            queryKey: ["workspaces", data.$id],
+            queryKey: ["project", data.$id],
           });
           router.push("/");
           router.refresh();
@@ -133,40 +128,22 @@ export default function EditWorkspaceForm({
     );
   };
 
-  const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
-
-  const [isCopied, setIsCopied] = useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(fullInviteLink);
-    toast.success("Copied to clipboard");
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 6000);
-  };
-
-  const handleResetInviteCode = () => { 
-    resetInvitecode({param: {workspaceId: initialValues.$id}}, {
-      onSuccess: (data) => { 
-        toast.success("Invite code reset successfully");
-        queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-        queryClient.invalidateQueries({
-          queryKey: ["workspace", data.$id],
-        });
-
-      },
-      onError: (error) => { 
-        toast.error(error.message);
-      }
-    })
-  };
-
   return (
     <div className="flex flex-col gap-8">
       <DeleteDialog />
       <Card className="border  w-full py-4 ">
         <CardHeader>
-          <CardTitle className="text-xl font-bold">
-            {initialValues.name}
-          </CardTitle>
+          <div className="flex items-center gap-4">
+            <Button className="w-fit " variant={"secondary"} size={"sm"} asChild>
+              <Link href={`/workspaces/${initialValues.workspaceId}/projects/${initialValues.$id}`}>
+                <ArrowLeft />
+                Back
+              </Link>
+            </Button>
+            <CardTitle className="text-xl font-bold">
+              {initialValues.name}
+            </CardTitle>
+          </div>
         </CardHeader>
         <DottedSeparator className="mb-1" />
         <CardContent>
@@ -276,7 +253,7 @@ export default function EditWorkspaceForm({
         </CardContent>
       </Card>
 
-      <Card className="border w-full py-4">
+      {/* <Card className="border w-full py-4">
         <CardContent>
           <div className="flex flex-col">
             <h3 className="font-bold">Invite members</h3>
@@ -311,14 +288,14 @@ export default function EditWorkspaceForm({
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       <Card className="border  w-full py-4">
         <CardContent>
           <div className="flex flex-col">
             <h3 className="font-bold">Danger Zone</h3>
             <p className="text-sm text-muted-foreground">
-              Deleting a workspace is permanent and cannot be undone.
+              Deleting a Project is permanent and cannot be undone.
             </p>
             <Button
               className="w-fit ml-auto mt-4"
@@ -328,7 +305,7 @@ export default function EditWorkspaceForm({
               disabled={isUpdatePending || isDeletePending}
               onClick={() => handleDelete()}
             >
-              Delete Worksapce
+              Delete Project
             </Button>
           </div>
         </CardContent>
