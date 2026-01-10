@@ -214,7 +214,7 @@ function CalendarDayButton({
       )}
       {...props}
     />
-  )
+  );
 }
 
 export { Calendar, CalendarDayButton }

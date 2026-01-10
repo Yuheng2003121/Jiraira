@@ -36,11 +36,13 @@ export const sessionMiddleware = createMiddleware<Context>(async (c, next) => {
   const databases = new Databases(client);
   const storage = new Storage(client);
   const user = await account.get();
+  const users = new Users(client);
 
   c.set("account", account);
   c.set("databases", databases);
   c.set("storage", storage);
   c.set("user", user);
+  c.set("users", users)
 
   await next();
 });

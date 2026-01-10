@@ -15,10 +15,11 @@ const buttonVariants = cva(
           "bg-gradient-to-b from-amber-600 to-amber-700 text-primary-foreground hover:from-amber-700 hover:to-amber-700",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary:
-          "border-none bg-white text-black hover:bg-neutral-100",
+        secondary: "border-none bg-white text-black hover:bg-neutral-100",
+        // ghost:
+        //   "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+          "hover:bg-accent hover:text-accent-foreground border-transparent shadow-none",
         link: "text-primary underline-offset-4 hover:underline",
         muted: "bg-neutral-200 text-neutral-600 hover:bg-neutral-200/80",
         teritary:

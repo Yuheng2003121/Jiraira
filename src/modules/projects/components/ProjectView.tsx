@@ -6,6 +6,7 @@ import ProjectAvatar from "./ProjectAvatar";
 import { Button } from "@/components/ui/button";
 import { PencilIcon } from "lucide-react";
 import Link from "next/link";
+import TaskViewSwitcher from "@/modules/tasks/components/TaskViewSwitcher";
 interface ProjectViewProps {
   workspaceId: string;
   projectId: string;
@@ -53,6 +54,7 @@ export default function ProjectView({
           </Link>
         </Button>
       </div>
+      <TaskViewSwitcher/>
     </div>
   );
 }

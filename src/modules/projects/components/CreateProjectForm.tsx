@@ -59,6 +59,7 @@ export default function CreateProjectForm({
       onSuccess: (data) => {
         toast.success("Project created successfully");
         queryClient.invalidateQueries({ queryKey: ["projects"] });
+        queryClient.invalidateQueries({ queryKey: ["tasks"] });
         form.reset();
 
         onCancel?.(); //关闭create PROJECT modal
