@@ -36,7 +36,7 @@ export function DatePicker({ onDateSelect, defaultDate }: DatePickerProps) {
           >
             <CalendarIcon className="size-4 text-muted-foreground" />
             <span className={cn(date ? "text-foreground" : "text-muted-foreground")}>
-              {date ? date.toLocaleDateString() : "Select date"}
+              {date ? date.toLocaleDateString() : "Select Due date"}
             </span>
             <ChevronDownIcon />
           </Button>

@@ -11,9 +11,15 @@ const ResponsiveModal = dynamic(() => import("@/components/ResponsiveModal"), {
 export default function CreateTaskModal() {
   const isOpen = useCreateTaskModalOpen((state) => state.isOpen);
   const setIsOpen = useCreateTaskModalOpen((state) => state.setIsOpen);
+  const setInitialStatus = useCreateTaskModalOpen(
+      (state) => state.setInitialStatus
+  );
 
   return (
-    <ResponsiveModal isOpen={isOpen} onOpenChange={setIsOpen}>
+    <ResponsiveModal isOpen={isOpen} onOpenChange={() => {
+      setIsOpen(false);
+      setInitialStatus(null);
+    }}>
       {/* <CreateTaskForm onCancel={() => setIsOpen(false)} /> */}
       <CreateTasksFormWrapper onCancel={() => setIsOpen(false)} />
     </ResponsiveModal>

@@ -34,6 +34,7 @@ import {
 import MemberAvatar from "@/modules/members/components/MemberAvatar";
 import { TaskStatus } from "../types";
 import ProjectAvatar from "@/modules/projects/components/ProjectAvatar";
+import { useCreateTaskModalOpen } from "@/store/useCreateTaskModalOpen";
 interface CreateTaskFormProps {
   onCancel?: () => void;
   projectOptions: { id: string; name: string; imageUrl: string }[];
@@ -46,6 +47,10 @@ export default function CreateTaskForm({
 }: CreateTaskFormProps) {
   const { mutate: createTask, isPending } = useCreateTask();
   const { workspaceId } = useParams();
+  const setInitialStatus = useCreateTaskModalOpen(
+    (state) => state.setInitialStatus
+  );
+  const initialStatus = useCreateTaskModalOpen((state) => state.initialStatus);
   // const omittedCreateTaskSchema = createTaskSchema.omit({ workspaceId: true });
 
   const form = useForm<z.infer<typeof createTaskSchema>>({
@@ -53,10 +58,10 @@ export default function CreateTaskForm({
     defaultValues: {
       workspaceId: workspaceId as string,
       name: "",
-      status: TaskStatus.TODO,
-      projectId: "", 
+      status: initialStatus || TaskStatus.TODO,
+      projectId: "",
       assigneeId: "",
-      dueDate: undefined, 
+      dueDate: undefined,
     },
   });
 
@@ -85,7 +90,7 @@ export default function CreateTaskForm({
   };
 
   const onDateSelect = (date: Date) => {
-    form.setValue("dueDate", date ? date.toISOString() : null);
+    form.setValue("dueDate", date ? date.toISOString() : undefined);
   };
 
   return (

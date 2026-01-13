@@ -124,25 +124,6 @@ export default function DataFilters({ hideProjectFilter }: DataFiltersProps) {
         </SelectContent>
       </Select>
 
-      <Select
-        defaultValue={projectId || undefined}
-        onValueChange={onProjectChange}
-      >
-        <SelectTrigger className="w-full lg:w-auto focus-visible:ring-0 ">
-          <div className="flex items-center">
-            <FolderIcon className="size-4 mr-2" />
-            <SelectValue placeholder="All projects" />
-          </div>
-        </SelectTrigger>
-        <SelectContent position="popper">
-          <SelectItem value="all">All projects</SelectItem>
-          {projectOptions?.map((project) => (
-            <SelectItem key={project.value} value={project.value}>
-              {project.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
 
       <div>
         <DatePicker

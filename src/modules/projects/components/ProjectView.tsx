@@ -34,7 +34,7 @@ export default function ProjectView({
 
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="h-full flex flex-col gap-4 min-h-0">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ProjectAvatar

@@ -22,7 +22,7 @@ export default function MemberAvatar({
     >
       <AvatarFallback
         className={cn(
-          "bg-neutral-200 font-medium text-neutral-500 flex items-center justify-center",
+          "size-5 bg-neutral-200 font-medium text-neutral-500 flex items-center justify-center",
           fallbackClassName
         )}
       >
