@@ -14,6 +14,7 @@ import { useTaskFilter } from "@/hooks/useTaskFilter";
 import { DataTable } from "@/components/ui/date-table";
 import { columns } from "./Columns";
 import DataKanban from "./DataKanban";
+import DataCalendar from "./DataCalendar";
 
 export default function TaskViewSwitcher() {
   const { workspaceId, projectId } = useParams();
@@ -83,7 +84,7 @@ export default function TaskViewSwitcher() {
             <DataKanban data={tasks || []} />
           </TabsContent>
           <TabsContent value="calender" className="">
-            {JSON.stringify(tasks)}
+            <DataCalendar data={tasks || []} />
           </TabsContent>
         </div>
       </div>
